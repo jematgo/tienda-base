@@ -15,3 +15,14 @@ const app = initializeApp(firebaseConfig)
 const analytics = getAnalytics(app)
 
 export default app
+import { initializeApp } from "firebase/app"
+import { getAuth } from "firebase/auth"
+
+const firebaseConfig = {
+  // tus datos de Firebase
+}
+
+const app = initializeApp(firebaseConfig)
+const auth = getAuth(app)
+
+export { auth }
