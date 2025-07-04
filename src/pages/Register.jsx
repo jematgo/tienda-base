@@ -1,3 +1,5 @@
+import { doc, setDoc } from "firebase/firestore"
+import { db } from "../firebaseConfig"
 import { useState } from "react"
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import { auth } from "../firebaseConfig"
@@ -9,21 +11,20 @@ export default function Register() {
   const navigate = useNavigate()
 
   const handleRegister = async (e) => {
-    e.preventDefault()
-    try {
-      await createUserWithEmailAndPassword(auth, email, password)
-      navigate("/")
-    } catch (error) {
-      alert("Error al registrarse")
-    }
-  }
+  e.preventDefault()
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+    const user = userCredential.user
 
-  return (
-    <form onSubmit={handleRegister}>
-      <h2>Crear cuenta</h2>
-      <input type="email" placeholder="Correo" onChange={(e) => setEmail(e.target.value)} />
-      <input type="password" placeholder="Contraseña" onChange={(e) => setPassword(e.target.value)} />
-      <button type="submit">Registrarse</button>
-    </form>
-  )
-}
+    // Guardar datos adicionales en Firestore
+    await setDoc(doc(db, "users", user.uid), {
+      email: user.email,
+      createdAt: new Date(),
+      role: "cliente"
+    })
+
+    navigate("/")
+  } catch (error) {
+    alert("Error al registrarse: " + error.message)
+  }
+  } }
